@@ -72,8 +72,7 @@ func AlbumExists(albName string) (bool, *utils.ApplicationError) {
 		panic(err)
 	}
 
-	row := Session.execute("SELECT * FROM albumtable WHERE albname = ? limit 1", albName)
-	if len(row.current_rows) == 0 {
+	if err := Session.Query("SELECT albname FROM albumtable LIMIT 1").Scan(&albName); err != nil {
 		return false, &utils.ApplicationError{
 			Message:    fmt.Sprintf("Album %v not found", albName),
 			StatusCode: http.StatusNotFound,
@@ -95,8 +94,7 @@ func ImageExists(albName, imgName string) (bool, *utils.ApplicationError) {
 		panic(err)
 	}
 
-	row := Session.execute("SELECT * FROM albumtable WHERE albname = ? CONTAINS ?", albName, imgName)
-	if len(row.current_rows) == 0 {
+	if err := Session.Query("SELECT imagelist FROM albumtable WHERE albname = ? LIMIT 1", albName).Scan(&imgName); err != nil {
 		return false, &utils.ApplicationError{
 			Message:    fmt.Sprintf("Image %v not found in album %v", imgName, albName),
 			StatusCode: http.StatusNotFound,
@@ -220,17 +218,17 @@ func ShowImagesInAlbum(albName string) ([]string, *utils.ApplicationError) {
 //ShowImage : Show a particular image inside an album
 func ShowImage(albName, imgName string) (string, *utils.ApplicationError) {
 	if ok, err := AlbumExists(albName); ok != true {
-		return nil, err
+		return "", err
 	}
 
 	if ok, err := ImageExists(albName, imgName); ok != true {
-		return nil, err
+		return "", err
 	}
 
 	Session, err := cluster.CreateSession()
 	defer Session.Close()
 	if err != nil {
-		return nil, &utils.ApplicationError{
+		return "", &utils.ApplicationError{
 			Message:    fmt.Sprintf("Create session failed"),
 			StatusCode: http.StatusInternalServerError,
 		}
@@ -249,7 +247,7 @@ FIRST:
 	}
 
 	if err := iter.Close(); err != nil {
-		return nil, &utils.ApplicationError{
+		return "", &utils.ApplicationError{
 			Message:    fmt.Sprintf("DB ERROR: %v", err),
 			StatusCode: http.StatusInternalServerError,
 		}
