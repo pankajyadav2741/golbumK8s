@@ -236,7 +236,7 @@ func ShowImage(albName, imgName string) (string, *utils.ApplicationError) {
 
 	iter := Session.Query("SELECT imagelist FROM albumtable WHERE albname='?';", albName).Iter()
 
-	var data string
+	var data []string
 FIRST:
 	for iter.Scan(&data) {
 		for _, img := range data {
