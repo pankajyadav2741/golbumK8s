@@ -19,20 +19,20 @@ func StartApp() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
 	//Show all albums
-	myRouter.HandleFunc("/", controller.showAlbum()).Methods(http.MethodGet)
+	myRouter.HandleFunc("/", controller.ShowAlbum).Methods(http.MethodGet)
 	//Create a new album
-	myRouter.HandleFunc("/{album}", controller.addAlbum()).Methods(http.MethodPost)
+	myRouter.HandleFunc("/{album}", controller.AddAlbum).Methods(http.MethodPost)
 	//Delete an existing album
-	myRouter.HandleFunc("/{album}", controller.deleteAlbum()).Methods(http.MethodDelete)
+	myRouter.HandleFunc("/{album}", controller.DeleteAlbum).Methods(http.MethodDelete)
 
 	//Show all images in an album
-	myRouter.HandleFunc("/{album}", controller.showImagesInAlbum()).Methods(http.MethodGet)
+	myRouter.HandleFunc("/{album}", controller.ShowImagesInAlbum).Methods(http.MethodGet)
 	//Show a particular image inside an album
-	myRouter.HandleFunc("/{album}/{image}", controller.showImage()).Methods(http.MethodGet)
+	myRouter.HandleFunc("/{album}/{image}", controller.ShowImage).Methods(http.MethodGet)
 	//Create an image in an album
-	myRouter.HandleFunc("/{album}/{image}", controller.addImage()).Methods(http.MethodPost)
+	myRouter.HandleFunc("/{album}/{image}", controller.AddImage).Methods(http.MethodPost)
 	//Delete an image in an album
-	myRouter.HandleFunc("/{album}/{image}", controller.deleteImage()).Methods(http.MethodDelete)
+	myRouter.HandleFunc("/{album}/{image}", controller.DeleteImage).Methods(http.MethodDelete)
 
 	srv := &http.Server{
 		Handler:      myRouter,
