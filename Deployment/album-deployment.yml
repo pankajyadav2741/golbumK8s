@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: album
+  labels:
+    app: album
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: album
+  template:
+    metadata:
+      labels:
+        app: album
+    spec:
+      containers:
+        - name: album
+          image: pankajyadav2741/golbum:2.0
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: cassandra
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
