@@ -4,6 +4,8 @@ LABEL maintainer="Pankaj Yadav <pankajyadav2741@gmail.com>"
 
 WORKDIR /app
 
+ENV GOPATH=C:\Users\Hp\go\src
+
 RUN apk update -qq && apk add git
 
 RUN go get github.com/gocql/gocql && \
