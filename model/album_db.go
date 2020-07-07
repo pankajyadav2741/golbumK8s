@@ -19,9 +19,6 @@ type Conf struct {
 //cluster : GoCQL cluster variable
 var cluster *gocql.ClusterConfig
 
-//Albums : Slice of struct
-var albums []Albums
-
 //init : Establish Database Connections
 func init() {
 	db := &Conf{}
@@ -113,7 +110,7 @@ func ImageExists(albName, imgName string) (bool, *utils.ApplicationError) {
 }
 
 //ShowAlbum : Show all albums
-func ShowAlbum() ([]Album, *utils.ApplicationError) {
+func ShowAlbum() ([]string, *utils.ApplicationError) {
 	Session, err := cluster.CreateSession()
 	defer Session.Close()
 	if err != nil {
@@ -124,17 +121,20 @@ func ShowAlbum() ([]Album, *utils.ApplicationError) {
 	}
 
 	iter := Session.Query("SELECT albname FROM albumtable;").Iter()
+
+	var albums []string
 	var data string
 	for iter.Scan(&data) {
-		return data, nil
-		//json.NewEncoder(w).Encode(data)
+		albums = append(albums, data)
 	}
+
 	if err := iter.Close(); err != nil {
 		return nil, &utils.ApplicationError{
 			Message:    fmt.Sprintf("DB ERROR: %v", err),
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
+	return albums, nil
 }
 
 //AddAlbum : Create a new album
@@ -185,7 +185,7 @@ func DeleteAlbum(albName string) *utils.ApplicationError {
 }
 
 //ShowImagesInAlbum : Show all images in an album
-func ShowImagesInAlbum(albName string) ([]Image, *utils.ApplicationError) {
+func ShowImagesInAlbum(albName string) ([]string, *utils.ApplicationError) {
 	if ok, err := AlbumExists(albName); ok != true {
 		return nil, err
 	}
@@ -200,21 +200,25 @@ func ShowImagesInAlbum(albName string) ([]Image, *utils.ApplicationError) {
 	}
 
 	iter := Session.Query("SELECT imagelist FROM albumtable WHERE albname=?;", albName).Iter()
-	var data []string
+
+	var albums []string
+	var data string
+
 	for iter.Scan(&data) {
-		return data, nil
-		//json.NewEncoder(w).Encode(data)
+		albums = append(albums, data)
 	}
+
 	if err := iter.Close(); err != nil {
 		return nil, &utils.ApplicationError{
 			Message:    fmt.Sprintf("DB ERROR: %v", err),
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
+	return albums, nil
 }
 
 //ShowImage : Show a particular image inside an album
-func ShowImage(albName, imgName string) (*Image, *utils.ApplicationError) {
+func ShowImage(albName, imgName string) (string, *utils.ApplicationError) {
 	if ok, err := AlbumExists(albName); ok != true {
 		return nil, err
 	}
@@ -233,21 +237,24 @@ func ShowImage(albName, imgName string) (*Image, *utils.ApplicationError) {
 	}
 
 	iter := Session.Query("SELECT imagelist FROM albumtable WHERE albname='?';", albName).Iter()
-	var data []string
+
+	var data string
+FIRST:
 	for iter.Scan(&data) {
 		for _, img := range data {
 			if img == imgName {
-				return img, nil
-				//json.NewEncoder(w).Encode(img)
+				break FIRST
 			}
 		}
 	}
+
 	if err := iter.Close(); err != nil {
 		return nil, &utils.ApplicationError{
 			Message:    fmt.Sprintf("DB ERROR: %v", err),
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
+	return imgName, nil
 }
 
 //AddImage : Create an image in an album

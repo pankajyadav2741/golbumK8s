@@ -6,7 +6,7 @@ import (
 )
 
 //ShowAlbum : Show all albums
-func ShowAlbum() ([]model.Album, *utils.ApplicationError) {
+func ShowAlbum() ([]string, *utils.ApplicationError) {
 	return model.ShowAlbum()
 }
 
@@ -21,12 +21,12 @@ func DeleteAlbum(albName string) *utils.ApplicationError {
 }
 
 //ShowImagesInAlbum : Show all images in an album
-func ShowImagesInAlbum(albName string) ([]model.Image, *utils.ApplicationError) {
+func ShowImagesInAlbum(albName string) ([]string, *utils.ApplicationError) {
 	return model.ShowImagesInAlbum(albName)
 }
 
 //ShowImage : Show a particular image inside an album
-func ShowImage(albName, imgName string) (*model.Image, *utils.ApplicationError) {
+func ShowImage(albName, imgName string) (string, *utils.ApplicationError) {
 	return model.ShowImage(albName, imgName)
 }
 
