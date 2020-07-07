@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"net/http"
+	"log"
+	"time"
 	"github.com/gocql/gocql"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pankajyadav2741/golbumK8s/utils"
@@ -67,10 +69,10 @@ func AlbumExists(albName string) (bool, *utils.ApplicationError) {
 	defer Session.Close()
 	if err != nil {
 		fmt.Println("Create session failed")
-		return err
+		panic(err)
 	}
 	
-	row = Session.Execute("SELECT * FROM albumtable WHERE albname = ? limit 1", albName)
+	row := Session.Execute("SELECT * FROM albumtable WHERE albname = ? limit 1", albName)
     if len(row.current_rows) == 0 { 
 		return false, &utils.ApplicationError{
 			Message:    fmt.Sprintf("Image %v not found in album %v", imgName, albName),
@@ -90,12 +92,10 @@ func ImageExists(albName, imgName string) (bool, *utils.ApplicationError) {
 	defer Session.Close()
 	if err != nil {
 		fmt.Println("Create session failed")
-		return err
+		panic(err)
 	}
 	
-	//r = session.execute(f"SELECT * FROM test_table WHERE id = {some_id} limit 1")
-    
-	row = Session.Execute("SELECT * FROM albumtable WHERE albname = ? CONTAINS ?", albName, imgName)
+	row := Session.Execute("SELECT * FROM albumtable WHERE albname = ? CONTAINS ?", albName, imgName)
     if len(row.current_rows) == 0 { 
 		return false, &utils.ApplicationError{
 			Message:    fmt.Sprintf("Image %v not found in album %v", imgName, albName),

@@ -4,13 +4,12 @@ LABEL maintainer="Pankaj Yadav <pankajyadav2741@gmail.com>"
 
 WORKDIR /app
 
-ENV GOPATH=C:\Users\Hp\go\src
-
 RUN apk update -qq && apk add git
 
 RUN go get github.com/gocql/gocql && \
     go get github.com/gorilla/mux && \
-	go get github.com/kelseyhightower/envconfig
+	go get github.com/kelseyhightower/envconfig && \
+	go get github.com/pankajyadav2741/golbumK8s
 
 COPY . .
 
